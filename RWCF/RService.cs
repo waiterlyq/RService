@@ -16,21 +16,34 @@ namespace RWCF
     {
         public bool GenerDSTree(string strModGUID)
         {
-            DataTable dtce = SQLHelper.GetTable("SELECT ECellName AS cn,CCellName AS cnz FROM dbo.DSTreeCEMap WHERE ModGUID = '" + strModGUID + "'");
-            string strModDataSource = SQLHelper.GetTable("SELECT ModDataSource FROM dbo.DSTreeModel WHERE ModGUID = '" + strModGUID + "'").Rows[0][0].ToString();
-            string strIsResultFactor = SQLHelper.GetTable("SELECT ECellName FROM dbo.DSTreeCEMap WHERE ModGUID = '" + strModGUID + "' AND IsResultFactor = 1").Rows[0][0].ToString();
-            DataTable dtsc = SQLHelper.GetTable(strModDataSource);
-            RDataFramePy rdfpy = new RDataFramePy();
-            rdfpy.setDataFrameInRByDt(dtsc);
-            dtsc.Clear();
-            using (RC50 rc = new RC50(rdfpy.DfName, strIsResultFactor))
+            if(string.IsNullOrEmpty(strModGUID))
             {
-                if (rc.EvaluateByR(rdfpy.DfR))
+                return false;
+            }
+            try
+            {
+                SQLHelper.ExcuteSQL("DELETE FROM DSTree WHERE ModGUID = '" + strModGUID + "'");
+                DataTable dtce = SQLHelper.GetTable("SELECT ECellName AS cn,CCellName AS cnz FROM dbo.DSTreeCEMap WHERE ModGUID = '" + strModGUID + "'");
+                string strModDataSource = SQLHelper.GetTable("SELECT ModDataSource FROM dbo.DSTreeModel WHERE ModGUID = '" + strModGUID + "'").Rows[0][0].ToString();
+                string strIsResultFactor = SQLHelper.GetTable("SELECT ECellName FROM dbo.DSTreeCEMap WHERE ModGUID = '" + strModGUID + "' AND IsResultFactor = 1").Rows[0][0].ToString();
+                DataTable dtsc = SQLHelper.GetTable(strModDataSource);
+                RDataFramePy rdfpy = new RDataFramePy();
+                rdfpy.setDataFrameInRByDt(dtsc);
+                dtsc.Clear();
+                using (RC50 rc = new RC50(rdfpy.DfName, strIsResultFactor))
                 {
-                    rdfpy.DfR = "";
+                    if (rc.EvaluateByR(rdfpy.DfR))
+                    {
+                        rdfpy.DfR = "";
+                    }
+                    RC50Tree rct = rc.getC50Tree(strModGUID, dtce, rdfpy.DtPy);
+                    SQLHelper.BulkToDB(rct.DtDstree, "DSTree");
                 }
-                RC50Tree rct = rc.getC50Tree(strModGUID, dtce, rdfpy.DtPy);
-                SQLHelper.BulkToDB(rct.DtDstree, "DSTree");
+            }
+            catch(Exception e)
+            {
+                MyLog.writeLog("ERROR", logtype.Error, e);
+                return false;
             }
             return true;
         }
