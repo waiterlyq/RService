@@ -37,11 +37,14 @@ namespace RWCF
             }
             try
             {
-                SQLHelper.ExcuteSQL("DELETE FROM DSTree WHERE ModGUID = '" + strModGUID + "'");
-                DataTable dtce = SQLHelper.GetTable("SELECT ECellName AS cn,CCellName AS cnz FROM dbo.DSTreeCEMap WHERE ModGUID = '" + strModGUID + "'");
-                string strModDataSource = SQLHelper.GetTable("SELECT ModDataSource FROM dbo.DSTreeModel WHERE ModGUID = '" + strModGUID + "'").Rows[0][0].ToString();
-                string strIsResultFactor = SQLHelper.GetTable("SELECT ECellName FROM dbo.DSTreeCEMap WHERE ModGUID = '" + strModGUID + "' AND IsResultFactor = 1").Rows[0][0].ToString();
-                DataTable dtsc = SQLHelper.GetTable(strModDataSource);
+                SQLHelper sqlMydb = new SQLHelper();
+                sqlMydb.ExcuteSQL("DELETE FROM DSTree WHERE ModGUID = '" + strModGUID + "'");
+                DataTable dtce = sqlMydb.GetTable("SELECT ECellName AS cn,CCellName AS cnz FROM dbo.DSTreeCEMap WHERE ModGUID = '" + strModGUID + "'");
+                string strModDataSource = sqlMydb.GetTable("SELECT ModDataSource FROM dbo.DSTreeModel WHERE ModGUID = '" + strModGUID + "'").Rows[0][0].ToString();
+                string strIsResultFactor = sqlMydb.GetTable("SELECT ECellName FROM dbo.DSTreeCEMap WHERE ModGUID = '" + strModGUID + "' AND IsResultFactor = 1").Rows[0][0].ToString();
+                string strTargetConn = sqlMydb.GetObject("SELECT  'data source=' + ModServer + ';initial catalog=' + ModDataBase + ';user id=' + ModUid + ';password=' + ModPassword + ';' FROM    dbo.DSTreeModel").ToString();
+                SQLHelper sqlTargetdb = new SQLHelper(strTargetConn);
+                DataTable dtsc = sqlTargetdb.GetTable(strModDataSource);
                 RDataFramePy rdfpy = new RDataFramePy();
                 rdfpy.setDataFrameInRByDt(dtsc);
                 dtsc.Clear();
@@ -52,8 +55,10 @@ namespace RWCF
                         rdfpy.DfR = "";
                     }
                     RC50Tree rct = rc.getC50Tree(strModGUID, dtce, rdfpy.DtPy);
-                    SQLHelper.BulkToDB(rct.DtDstree, "DSTree");
+                    sqlMydb.BulkToDB(rct.DtDstree, "DSTree");
                 }
+                sqlMydb = null;
+                sqlTargetdb = null;
             }
             catch (Exception e)
             {
