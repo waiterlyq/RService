@@ -83,6 +83,7 @@
   <ItemGroup>
     <Compile Include="IRService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RQueue.cs" />
     <Compile Include="RService.cs" />
   </ItemGroup>
   <ItemGroup>

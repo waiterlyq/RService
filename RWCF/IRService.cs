@@ -12,7 +12,7 @@ namespace RWCF
     public interface IRService
     {
         [OperationContract]
-        bool GenerDSTree(string strModGUID);
+        bool AddRq(string strModGUID);
 
         // TODO: 在此添加您的服务操作
     }
