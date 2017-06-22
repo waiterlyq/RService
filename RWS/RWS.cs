@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.ServiceModel;
 using System.Timers;
 using RWCF;
+using Loglib;
 
 
 namespace RWS
@@ -53,6 +54,7 @@ namespace RWS
                 {
                     string strModGUID = rq.Dequeue();
                     RService.GenerDstree(strModGUID);
+                    MyLog.writeLog("执行", logtype.Info);
                 }
             }
         }

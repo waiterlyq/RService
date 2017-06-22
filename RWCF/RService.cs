@@ -45,6 +45,7 @@ namespace RWCF
                 string strTargetConn = sqlMydb.GetObject("SELECT  'data source=' + ModServer + ';initial catalog=' + ModDataBase + ';user id=' + ModUid + ';password=' + ModPassword + ';' FROM    dbo.DSTreeModel").ToString();
                 SQLHelper sqlTargetdb = new SQLHelper(strTargetConn);
                 DataTable dtsc = sqlTargetdb.GetTable(strModDataSource);
+                RepDtCN(dtce,ref dtsc);
                 RDataFramePy rdfpy = new RDataFramePy();
                 rdfpy.setDataFrameInRByDt(dtsc);
                 dtsc.Clear();
@@ -63,6 +64,15 @@ namespace RWCF
             catch (Exception e)
             {
                 MyLog.writeLog("ERROR", logtype.Error, e);
+            }
+        }
+
+        public static void RepDtCN(DataTable dtce, ref DataTable dt)
+        {
+            int ic = dt.Columns.Count;
+            for(int i =0;i< ic;i++)
+            {
+                dt.Columns[i].ColumnName = dtce.Select("cnz = '"+ dt.Columns[i].ColumnName + "'")[0][0].ToString();
             }
         }
     }

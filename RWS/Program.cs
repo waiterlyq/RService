@@ -20,6 +20,7 @@ namespace RWS
                 new RWS()
             };
             ServiceBase.Run(ServicesToRun);
+            log4net.Config.XmlConfigurator.Configure();
         }
     }
 }
