@@ -33,7 +33,7 @@ namespace RWCF
         {
             if (string.IsNullOrEmpty(strModGUID))
             {
-                return ;
+                return;
             }
             try
             {
@@ -45,7 +45,7 @@ namespace RWCF
                 string strTargetConn = sqlMydb.GetObject("SELECT  'data source=' + ModServer + ';initial catalog=' + ModDataBase + ';user id=' + ModUid + ';password=' + ModPassword + ';' FROM    dbo.DSTreeModel").ToString();
                 SQLHelper sqlTargetdb = new SQLHelper(strTargetConn);
                 DataTable dtsc = sqlTargetdb.GetTable(strModDataSource);
-                RepDtCN(dtce,ref dtsc);
+                RepDtCN(dtce, ref dtsc);
                 RDataFramePy rdfpy = new RDataFramePy();
                 rdfpy.setDataFrameInRByDt(dtsc);
                 dtsc.Clear();
@@ -57,6 +57,34 @@ namespace RWCF
                     }
                     RC50Tree rct = rc.getC50Tree(strModGUID, dtce, rdfpy.DtPy);
                     sqlMydb.BulkToDB(rct.DtDstree, "DSTree");
+                    sqlMydb.BulkToDB(rct.DtFactors, "DSTree");
+                    string strCsSql = @"WITH    tmp
+                                AS ( SELECT   a.ID AS tm ,
+                                a.*
+                                FROM     dbo.DSTree a
+                                WHERE    a.ModGUID = '" + strModGUID + "'";
+                    strCsSql += @" UNION ALL
+                                SELECT   c.tm AS tm ,
+                                b.*
+                                FROM     dbo.DSTree b
+                                JOIN tmp c ON b.PID = c.ID
+                                WHERE    b.ModGUID = '" + strModGUID + "'";
+                    strCsSql += @")
+                                UPDATE  dbo.DSTree
+                                SET     CoverCount = d.CoverCount ,
+                                ErrorCount = d.ErrorCount
+                                FROM    DSTree ,
+                                ( SELECT    tm ,
+                                ModGUID ,
+                                SUM(CoverCount) AS CoverCount ,
+                                SUM(ErrorCount) AS ErrorCount
+                                FROM      tmp
+                                GROUP BY  tm ,
+                                ModGUID
+                                ) d
+                                WHERE   dbo.DSTree.ModGUID = d.ModGUID
+                                AND dbo.DSTree.ID = d.tm";
+                    sqlMydb.ExcuteSQL(strCsSql);
                 }
                 sqlMydb = null;
                 sqlTargetdb = null;
@@ -70,9 +98,9 @@ namespace RWCF
         public static void RepDtCN(DataTable dtce, ref DataTable dt)
         {
             int ic = dt.Columns.Count;
-            for(int i =0;i< ic;i++)
+            for (int i = 0; i < ic; i++)
             {
-                dt.Columns[i].ColumnName = dtce.Select("cnz = '"+ dt.Columns[i].ColumnName + "'")[0][0].ToString();
+                dt.Columns[i].ColumnName = dtce.Select("cnz = '" + dt.Columns[i].ColumnName + "'")[0][0].ToString();
             }
         }
     }
