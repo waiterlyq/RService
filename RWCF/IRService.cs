@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
+using System.IO;
+using System.Net;
 using System.Text;
 
 namespace RWCF
@@ -14,6 +16,8 @@ namespace RWCF
         [OperationContract]
         bool AddRq(string strModGUID);
 
+        [OperationContract]
+        bool saveFile(string fileName,string context);
         // TODO: 在此添加您的服务操作
     }
 }

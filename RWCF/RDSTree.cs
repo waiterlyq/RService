@@ -16,7 +16,7 @@ namespace RWCF
     /// </summary>
     public enum ModStatus { WaitingForGenerate, Generating, Generated }
 
-    class RDSTree:IDisposable
+    public class RDSTree : IDisposable
     {
         /// <summary>
         /// 模型GUID
@@ -30,11 +30,15 @@ namespace RWCF
         /// 目标库连接类
         /// </summary>
         public SQLHelper targetdb;
-
+        /// <summary>
+        /// 字段拼音中文对照
+        /// </summary>
         public DataTable dtce;
-
-        public string strIsResultFactor;
-
+        /// <summary>
+        /// 结果字段
+        /// </summary>
+        public string strResultFactor;
+        public bool IsFileDataSource;
         public bool IsComplete;
 
         public RDSTree(string strModGUID)
@@ -46,12 +50,13 @@ namespace RWCF
                 string strTargetConn = mydb.GetObject("SELECT  'data source=' + ModServer + ';initial catalog=' + ModDataBase + ';user id=' + ModUid + ';password=' + ModPassword + ';' FROM    dbo.DSTreeModel  WHERE ModGUID = '" + strModGUID + "'").ToString();
                 targetdb = new SQLHelper(strTargetConn);
                 dtce = mydb.GetTable("SELECT ECellName AS cn,CCellName AS cnz FROM dbo.DSTreeCEMap WHERE ModGUID = '" + ModGUID + "'");
-                strIsResultFactor = mydb.GetObject("SELECT ECellName FROM dbo.DSTreeCEMap WHERE ModGUID = '" + strModGUID + "' AND IsResultFactor = 1").ToString();
+                strResultFactor = mydb.GetObject("SELECT ECellName FROM dbo.DSTreeCEMap WHERE ModGUID = '" + strModGUID + "' AND IsResultFactor = 1").ToString();
+                IsFileDataSource = mydb.GetObject("SELECT ISNULL(IsFileDataSource,0) AS IsFileDataSource FROM dbo.DSTreeModel WHERE ModGUID = '" + strModGUID + "'").ToString() == "1" ? true : false;
                 IsComplete = true;
             }
             catch (Exception e)
             {
-                MyLog.writeLog("ERROR", logtype.Error, e);
+                MyLog.writeLog("ERROR", e);
                 IsComplete = false;
             }
         }
@@ -90,7 +95,7 @@ namespace RWCF
             ChangeModStatus(ModStatus.Generating);
             RDataFramePy rdfpy = new RDataFramePy();
             rdfpy.setDataFrameInRByDt(GetDataSample());
-            RC50 rc = new RC50(rdfpy.DfName, strIsResultFactor);
+            RC50 rc = new RC50(rdfpy.DfName, strResultFactor);
             if (rc.EvaluateByR(rdfpy.DfR))
             {
                 rdfpy.DfR = "";
@@ -137,9 +142,9 @@ namespace RWCF
                                 AND dbo.DSTree.ID = d.tm";
                 mydb.ExcuteSQL(strCsSql);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                MyLog.writeLog("ERROR", logtype.Error, e);
+                MyLog.writeLog("ERROR", e);
             }
         }
 
@@ -149,6 +154,10 @@ namespace RWCF
         /// <returns></returns>
         public DataTable GetDataSample()
         {
+            if(IsFileDataSource)
+            {
+
+            }
             string strModDataSource = mydb.GetObject("SELECT ModDataSource FROM dbo.DSTreeModel WHERE ModGUID = '" + ModGUID + "'").ToString();
             DataTable dt = new DataTable();
             try
@@ -159,7 +168,7 @@ namespace RWCF
             }
             catch (Exception e)
             {
-                MyLog.writeLog("ERROR", logtype.Error, e);
+                MyLog.writeLog("ERROR", e);
                 return dt;
             }
 

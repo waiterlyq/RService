@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Web;
+using System.IO;
 using Loglib;
 
 namespace RWCF
@@ -23,27 +25,19 @@ namespace RWCF
             return true;
         }
 
-        /// <summary>
-        /// 生成决策树
-        /// </summary>
-        /// <param name="strModGUID"></param>
-        public static void GenerDstree(string strModGUID)
+        public bool saveFile(string fileName, string context)
         {
-            if (string.IsNullOrEmpty(strModGUID))
-            {
-                return;
-            }
             try
             {
-                using (RDSTree rt = new RDSTree(strModGUID))
-                {
-                    rt.GenerateDstree();
-                }
+                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+                File.WriteAllText(filePath, context);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
-                MyLog.writeLog("ERROR", logtype.Error, e);
+                MyLog.writeLog("ERROR", e);
             }
+            
+            return true;
         }
     }
 }
