@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <system.web>
+    <!--  ��̬���Ա���
+          ���� compilation debug="true" �Խ����Է���(.pdb ��Ϣ)
+          ���뵽����ҳ�С���Ϊ�⽫����ִ������
+          �����Ĵ��ļ�������Ӧ��ֻ�ڵ���ʱ����ֵ����Ϊ true������������ʱ������Ϊ
+          false���йظ�����Ϣ����ο��й�
+          ���� ASP.NET �ļ����ĵ���
+    -->
+    <compilation defaultLanguage="vb" debug="true" />
+
+    <!--  �Զ��������Ϣ
+          ���� customErrors mode="On" �� "RemoteOnly" �������Զ��������Ϣ��������Ϊ "Off" �Խ����Զ��������Ϣ�� 
+          Ϊÿ��Ҫ����Ĵ������ <error> ��ǡ�
+
+          "On" ʼ����ʾ�Զ���(�Ѻõ�)��Ϣ��
+          "Off" ʼ����ʾ��ϸ�� ASP.NET ������Ϣ��
+          "RemoteOnly" ֻ�Բ��ڱ��� Web �����������е�
+           �û���ʾ�Զ���(�Ѻõ�)��Ϣ�����ڰ�ȫĿ�ģ�����ʹ�ô����ã��Ա� 
+           ����Զ�̿ͻ�����ʾӦ�ó������ϸ��Ϣ��
+    -->
+    <customErrors mode="RemoteOnly" />
+
+    <!--  �����֤ 
+          �˽�����Ӧ�ó���������֤���ԡ����ܵ�ģʽ�� "Windows"�� 
+          "Forms"�� "Passport" �� "None"
+
+          "None" ��ִ�������֤�� 
+          "Windows" IIS ����Ӧ�ó��������ִ�������֤ 
+            (��������Ҫ�򼯳� Windows)���� IIS �б�������������ʡ�
+          "Forms" ��Ϊ�û��ṩһ������ƾ�ݵ��Զ��崰��(Web ҳ)��Ȼ�� 
+           ������Ӧ�ó�������֤���ǵ���ݡ��û�ƾ�ݱ�Ǵ洢�� Cookie �С�
+          "Passport" �����֤��ͨ�� Microsoft �ļ��������֤����ִ�еģ�
+           ��Ϊ��Ավ���ṩ������¼�ͺ��������ļ�����
+    -->
+    <authentication mode="Windows" /> 
+
+
+    <!--  ��Ȩ 
+           �˽�����Ӧ�ó������Ȩ���ԡ����������ܾ���ͬ���û����ɫ����
+          Ӧ�ó�����Դ��ͨ���: "*" ��ʾ�κ��ˣ�"?" ��ʾ����
+          (δ�������֤��)�û���
+    -->
+    <authorization>
+        <allow users="*" /> <!-- ���������û� -->
+
+            <!--  <allow     users="[���ŷָ���û��б�]"
+                             roles="[���ŷָ�Ľ�ɫ�б�]"/>
+                  <deny      users="[���ŷָ���û��б�]"
+                             roles="[���ŷָ�Ľ�ɫ�б�]"/>
+            -->
+    </authorization>
+
+    <!--  Ӧ�ó��򼶱���ټ�¼
+          Ӧ�ó��򼶱����ΪӦ�ó����е�ÿһҳ���ø�����־�����
+          ���� trace enabled="true" ��������Ӧ�ó�����ټ�¼����� pageOutput="true"����
+          ��ÿһҳ�ĵײ���ʾ������Ϣ�����򣬿���ͨ����� Web Ӧ�ó���
+           ��Ŀ¼�е� "trace.axd" ҳ���鿴
+          Ӧ�ó��������־��
+    -->
+    <trace enabled="false" requestLimit="10" pageOutput="false" traceMode="SortByTime" localOnly="true" />
+
+
+    <!--  �Ự״̬����
+          Ĭ������£�ASP.NET ʹ�� Cookie ����ʶ��Щ���������ض��ĻỰ��
+          ��� Cookie �����ã������ͨ�����Ự��ʶ����ӵ� URL �����ٻỰ��
+         ��Ҫ���� Cookie�������� sessionState cookieless="true"��
+    -->
+    <sessionState 
+            mode="InProc"
+            stateConnectionString="tcpip=127.0.0.1:42424"
+	    sqlConnectionString="data source=127.0.0.1;Trusted_Connection=yes"
+            cookieless="false" 
+            timeout="20" 
+    />
+
+    <!--  ȫ��
+          �˽�����Ӧ�ó����ȫ�����á�
+    -->
+    <globalization requestEncoding="utf-8" responseEncoding="utf-8" />
+   
+  </system.web>
+
+</configuration>

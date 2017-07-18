@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Data;
 using Rlib;
 using Pylib;
-using DBLib;
+using DBlib;
 using Loglib;
 
 namespace RWCF
@@ -154,23 +154,28 @@ namespace RWCF
         /// <returns></returns>
         public DataTable GetDataSample()
         {
-            if(IsFileDataSource)
+            DataTable dt = new DataTable();
+            if (IsFileDataSource)
             {
 
-            }
-            string strModDataSource = mydb.GetObject("SELECT ModDataSource FROM dbo.DSTreeModel WHERE ModGUID = '" + ModGUID + "'").ToString();
-            DataTable dt = new DataTable();
-            try
-            {
-                dt = targetdb.GetTable(strModDataSource);
-                RepDtCN(ref dt);
                 return dt;
             }
-            catch (Exception e)
+            else
             {
-                MyLog.writeLog("ERROR", e);
-                return dt;
+                string strModDataSource = mydb.GetObject("SELECT ModDataSource FROM dbo.DSTreeModel WHERE ModGUID = '" + ModGUID + "'").ToString();
+                try
+                {
+                    dt = targetdb.GetTable(strModDataSource);
+                    RepDtCN(ref dt);
+                    return dt;
+                }
+                catch (Exception e)
+                {
+                    MyLog.writeLog("ERROR", e);
+                    return dt;
+                }
             }
+           
 
         }
 
