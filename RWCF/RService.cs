@@ -2,6 +2,7 @@
 using System.Web;
 using System.IO;
 using Loglib;
+using Filelib;
 
 namespace RWCF
 {
@@ -29,7 +30,8 @@ namespace RWCF
         {
             try
             {
-                string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+                //string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory+"//UpLoadFiles//", fileName);
+                string filePath = FileHelper.GetFilePath(AppDomain.CurrentDomain.BaseDirectory, fileName, "UpLoadFiles");
                 File.WriteAllText(filePath, context);
             }
             catch(Exception e)
