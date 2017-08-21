@@ -53,8 +53,11 @@ namespace RWS
                 while (rq.Count > 0)
                 {
                     string strModGUID = rq.Dequeue();
-                    RService.GenerDstree(strModGUID);
-                    MyLog.writeLog("执行", logtype.Info);
+                    using (RDSTree rt = new RDSTree(strModGUID))
+                    {
+                        rt.GenerateDstree();
+                    }
+                    MyLog.writeLog("执行");
                 }
             }
         }
